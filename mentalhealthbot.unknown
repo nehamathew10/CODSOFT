@@ -1,0 +1,99 @@
+import random
+import re
+
+class MentalHealthBot:
+   
+    exit_phrases = ("see you later", "take care", "until next time", "goodbye", "catch you later", "bye", "talk to you later")
+    positive_responses = ("fine", "doing well", "fantastic", "awesome", "great", "good", "better")
+    negative_responses = ("not great", "having a tough day", "feeling down", "not good", "bad day", "not feeling")
+
+    def __init__(self):
+        self.intention_patterns = {
+            'day_check': r'.*\bday\b.*',
+            'advice_request': r'.*\badvice\b.*',
+            'mood_improvement': r'.*\bfeel\b.*\bbetter\b.*',
+            'general_support': r'.*\bneed\b.*\bhelp\b.*'
+        }
+
+    def initiate_conversation(self):
+        self.user_name = input("Hi there! I'm MentalHealthBot. What's your name?\n")
+        self.check_in()
+
+    def check_in(self):
+        user_day_feedback = input(f"Hello {self.user_name}, How are you today?\n")
+        if self.is_exit(user_day_feedback):
+            print("I'm here whenever you need. Wishing you a wonderful day ahead!")
+            return
+        if self.is_positive(user_day_feedback):
+            print("That's fantastic to hear! Keep shining brightly.")
+        elif self.is_negative(user_day_feedback):
+            print("I'm sorry to hear that. Let's talk about it and see how we can make things better.")
+        else:
+            print("Got it. It's okay to have mixed feelings. How else can I support you today?")
+        self.engage_in_chat()
+
+    def engage_in_chat(self):
+        while True:
+            user_message = input("Feel free to share or ask anything. How can I assist you today?\n").lower()
+            if self.is_exit(user_message):
+                print("I'm here whenever you need. Wishing you a wonderful day ahead!")
+                break  # Exit the chat loop
+            response = self.create_response(user_message)
+            print(response)
+            # Prompting again if the conversation is not ending
+
+    def is_exit(self, user_message):
+        return user_message.lower() in self.exit_phrases
+
+    def is_positive(self, user_message):
+        return any(response in user_message.lower() for response in self.positive_responses)
+
+    def is_negative(self, user_message):
+        return any(response in user_message.lower() for response in self.negative_responses)
+
+    def create_response(self, user_message):
+        if self.is_positive(user_message):
+            return self.respond_to_mood_improvement()
+        for intent, pattern in self.intention_patterns.items():
+            if re.search(pattern, user_message):
+                return getattr(self, f"respond_to_{intent}")()
+        return self.respond_to_unknown()
+
+    def respond_to_day_check(self):
+        responses = (
+            "Reflecting on your day can be helpful. How did things unfold for you today?\n",
+            "Sharing about your day might help you feel better. What happened today?\n"
+        )
+        return random.choice(responses)
+
+    def respond_to_advice_request(self):
+        responses = (
+            "Talking about what’s on your mind can be really insightful. What would you like advice on?\n",
+            "I’m here to offer guidance. Feel free to share what's bothering you.\n"
+        )
+        return random.choice(responses)
+
+    def respond_to_mood_improvement(self):
+        responses = (
+            "It's wonderful to hear that you're feeling better. Keep focusing on the positive.\n",
+            "Great job on improving your mood. Keep up the good work and take care of yourself!\n"
+        )
+        return random.choice(responses)
+
+    def respond_to_general_support(self):
+        responses = (
+            "I'm here to help you with whatever you need. What can I assist you with today?\n",
+            "Don't hesitate to reach out for support. How can I be of service to you?\n"
+        )
+        return random.choice(responses)
+
+    def respond_to_unknown(self):
+        responses = (
+            "It’s okay if you’re not sure how to express yourself. Can you tell me a bit more?\n",
+            "If you’re having trouble articulating your feelings, I’m here to listen. Please try to explain a little more.\n"
+        )
+        return random.choice(responses)
+
+
+mental_health_bot = MentalHealthBot()
+mental_health_bot.initiate_conversation()
